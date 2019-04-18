@@ -2,7 +2,7 @@ import React from 'react';
 import { Segment, Item, Icon, List, Button } from 'semantic-ui-react';
 import EventListAttendee from './EventListAttendee';
 
-const EventListItem = ({ event: { title, hostedBy, date, venue, description, hostPhotoURL, attendees } }) => (
+const EventListItem = ({ event: { title, hostedBy, date, venue, description, hostPhotoURL, attendees = [] } }) => (
   <Segment.Group>
     <Segment>
       <Item.Group>
@@ -33,9 +33,7 @@ const EventListItem = ({ event: { title, hostedBy, date, venue, description, hos
     </Segment>
     <Segment secondary>
       <List horizontal>
-        {attendees.map(attendee => (
-          <EventListAttendee key={attendee.id} attendee={attendee} />
-        ))}
+        {!!attendees.length && attendees.map(attendee => <EventListAttendee key={attendee.id} attendee={attendee} />)}
       </List>
     </Segment>
     <Segment clearing>

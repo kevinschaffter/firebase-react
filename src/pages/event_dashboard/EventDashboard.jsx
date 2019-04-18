@@ -1,5 +1,6 @@
 import React, { useReducer } from 'react';
 import { Grid, Button } from 'semantic-ui-react';
+import cuid from 'cuid';
 import EventList from './event_list/EventList';
 import EventForm from './event_form/EventForm';
 
@@ -57,10 +58,16 @@ const eventsMock = [
 const reducer = (state, action) => ({ ...state, ...action });
 
 const EventDashboard = () => {
-  const [state, dispatch] = useReducer(reducer, { events: eventsMock, isOpen: false });
+  const [state, setState] = useReducer(reducer, { events: eventsMock, isOpen: false });
   const { events, isOpen } = state;
 
-  const handleFormOpen = isOpen => dispatch({ isOpen });
+  const handleFormOpen = isOpen => setState({ isOpen });
+
+  const handleCreateEvent = newEvent => {
+    newEvent.id = cuid();
+    newEvent.hostPhotoURL = 'https://www.fillmurray.com/100/100';
+    setState({ events: [...state.events, newEvent], isOpen: false });
+  };
   return (
     <Grid>
       <Grid.Column width={10}>
@@ -68,7 +75,7 @@ const EventDashboard = () => {
       </Grid.Column>
       <Grid.Column width={6}>
         <Button positive content="Create Event" onClick={_ => handleFormOpen(true)} />
-        {isOpen && <EventForm handleCancel={handleFormOpen} />}
+        {isOpen && <EventForm handleCancel={handleFormOpen} handleCreateEvent={handleCreateEvent} />}
       </Grid.Column>
     </Grid>
   );
