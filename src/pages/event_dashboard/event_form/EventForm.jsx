@@ -1,13 +1,18 @@
-import React, { useReducer } from 'react';
+import React, { useReducer, useEffect } from 'react';
 import { Button, Segment, Form } from 'semantic-ui-react';
 
 const reducer = (state, action) => ({ ...state, ...action });
 
-const EventForm = ({ handleCancel, handleCreateEvent }) => {
-  const [state, setState] = useReducer(reducer, { event: { title: '', date: '', city: '', venue: '', hostedBy: '' } });
+const emptyEvent = { event: { title: '', date: '', city: '', venue: '', hostedBy: '' } };
+
+const EventForm = ({ handleCancel, handleCreateEvent, selectedEvent, handleUpdateEvent }) => {
+  const [state, setState] = useReducer(reducer, { event: emptyEvent });
+  const { event } = state;
   const handleInputChange = ({ target: { value, name } }) => setState({ event: { ...state.event, [name]: value } });
 
-  const { event } = state;
+  useEffect(() => {
+    if (selectedEvent) setState({ event: selectedEvent });
+  }, [selectedEvent]);
 
   return (
     <Segment>
@@ -42,7 +47,11 @@ const EventForm = ({ handleCancel, handleCreateEvent }) => {
             value={event.hostedBy}
           />
         </Form.Field>
-        <Button positive type="submit" onClick={_ => handleCreateEvent(event)}>
+        <Button
+          positive
+          type="submit"
+          onClick={_ => (selectedEvent ? handleUpdateEvent(event) : handleCreateEvent(event))}
+        >
           Submit
         </Button>
         <Button onClick={_ => handleCancel(false)} type="button">

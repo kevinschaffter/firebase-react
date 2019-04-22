@@ -8,7 +8,7 @@ const eventsMock = [
   {
     id: '1',
     title: 'Trip to Tower of London',
-    date: '2018-03-27T11:00:00+00:00',
+    date: '2018-03-27',
     category: 'culture',
     description:
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus sollicitudin ligula eu leo tincidunt, quis scelerisque magna dapibus. Sed eget ipsum vel arcu vehicula ullamcorper.',
@@ -32,7 +32,7 @@ const eventsMock = [
   {
     id: '2',
     title: 'Trip to Punch and Judy Pub',
-    date: '2018-03-28T14:00:00+00:00',
+    date: '2018-03-28',
     category: 'drinks',
     description:
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus sollicitudin ligula eu leo tincidunt, quis scelerisque magna dapibus. Sed eget ipsum vel arcu vehicula ullamcorper.',
@@ -58,12 +58,25 @@ const eventsMock = [
 const reducer = (state, action) => ({ ...state, ...action });
 
 const EventDashboard = () => {
-  const [state, setState] = useReducer(reducer, { events: eventsMock, isOpen: false });
-  const { events, isOpen } = state;
+  const [state, setState] = useReducer(reducer, { events: eventsMock, isOpen: false, selectedEvent: null });
+  const { events, isOpen, selectedEvent } = state;
 
-  const handleFormOpen = isOpen => setState({ isOpen });
+  const handleFormOpen = isOpen => setState({ isOpen, selectedEvent: null });
+
+  const handleEditEvent = eventToUpdate => () => setState({ selectedEvent: eventToUpdate, isOpen: true });
+
+  const handleUpdateEvent = updatedEvent => {
+    console.log(updatedEvent, 'updatedEvent');
+
+    setState({
+      events: events.reduce((acc, val) => acc.concat(val.id === updatedEvent.id ? updatedEvent : val), []),
+      selectedEvent: null,
+    });
+  };
 
   const handleCreateEvent = newEvent => {
+    console.log(newEvent, 'here is new event');
+
     newEvent.id = cuid();
     newEvent.hostPhotoURL = 'https://www.fillmurray.com/100/100';
     setState({ events: [...state.events, newEvent], isOpen: false });
@@ -71,11 +84,18 @@ const EventDashboard = () => {
   return (
     <Grid>
       <Grid.Column width={10}>
-        <EventList events={events} />
+        <EventList onEventEdit={handleEditEvent} events={events} />
       </Grid.Column>
       <Grid.Column width={6}>
         <Button positive content="Create Event" onClick={_ => handleFormOpen(true)} />
-        {isOpen && <EventForm handleCancel={handleFormOpen} handleCreateEvent={handleCreateEvent} />}
+        {isOpen && (
+          <EventForm
+            selectedEvent={selectedEvent}
+            handleCancel={handleFormOpen}
+            handleCreateEvent={handleCreateEvent}
+            handleUpdateEvent={handleUpdateEvent}
+          />
+        )}
       </Grid.Column>
     </Grid>
   );
