@@ -66,17 +66,18 @@ const EventDashboard = () => {
   const handleEditEvent = eventToUpdate => () => setState({ selectedEvent: eventToUpdate, isOpen: true });
 
   const handleUpdateEvent = updatedEvent => {
-    console.log(updatedEvent, 'updatedEvent');
-
     setState({
       events: events.reduce((acc, val) => acc.concat(val.id === updatedEvent.id ? updatedEvent : val), []),
       selectedEvent: null,
     });
   };
 
+  const handleDeleteEvent = eventId => _ => {
+    setState({ events: events.filter(({ id }) => id !== eventId) });
+  };
+
   const handleCreateEvent = newEvent => {
     console.log(newEvent, 'here is new event');
-
     newEvent.id = cuid();
     newEvent.hostPhotoURL = 'https://www.fillmurray.com/100/100';
     setState({ events: [...state.events, newEvent], isOpen: false });
@@ -84,7 +85,7 @@ const EventDashboard = () => {
   return (
     <Grid>
       <Grid.Column width={10}>
-        <EventList onEventEdit={handleEditEvent} events={events} />
+        <EventList onEventEdit={handleEditEvent} events={events} deleteEvent={handleDeleteEvent} />
       </Grid.Column>
       <Grid.Column width={6}>
         <Button positive content="Create Event" onClick={_ => handleFormOpen(true)} />
